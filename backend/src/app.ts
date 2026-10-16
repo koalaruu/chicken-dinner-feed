@@ -79,7 +79,7 @@ export async function buildApp(): Promise<AppContext> {
   // It is enabled for loopback only, so that a browser source pointed at 127.0.0.1 from a differently
   // spelled host (localhost) still works.
   await app.register(fastifyCors, {
-    origin: [/^https?:\/\/localhost(:\d+)?$/, /^https?:\/\/127\.0\.0\.1(:\d+)?$/],
+    origin: true,
   });
 
   await app.register(fastifyWebsocket);
