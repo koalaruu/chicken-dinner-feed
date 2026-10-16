@@ -1,5 +1,4 @@
 import type { TeamRosterDocument, TeamRosterEntry } from '@cdf/shared';
-import { TeamLogoCell } from './TeamLogoCell';
 
 export interface TeamRosterEditorProps {
   document: TeamRosterDocument;
@@ -36,9 +35,8 @@ export function TeamRosterEditor({ document, onChange }: TeamRosterEditorProps) 
   return (
     <div className="grid gap-3">
       <p className="text-muted-foreground text-xs">
-        The number is the slot the game reports, matching your <code>TeamLogoAndColor.ini</code>.
-        The name is what the overlay prints. Logos upload as soon as you pick them — the rest of the
-        row needs <strong>Save teams</strong>. Importing an ini replaces this whole list.
+        Nomor slot adalah nomor tim di dalam game (1–25). Nama tim adalah yang akan tampil pada seluruh
+        overlay siaran. Klik <strong>Save teams</strong> untuk menyimpan perubahan nama tim.
       </p>
 
       <div className="grid gap-2">
@@ -47,27 +45,16 @@ export function TeamRosterEditor({ document, onChange }: TeamRosterEditorProps) 
           .map((team) => (
             <div
               key={team.teamNo}
-              className="grid grid-cols-[2.5rem_4.5rem_1fr_2rem] items-center gap-2"
+              className="grid grid-cols-[2.5rem_1fr_2rem] items-center gap-2"
             >
-              <span className="text-muted-foreground text-center text-sm tabular-nums">
+              <span className="text-muted-foreground text-center text-sm tabular-nums font-bold">
                 {team.teamNo}
               </span>
-              <TeamLogoCell
-                team={team}
-                onChange={(updated) =>
-                  onChange({
-                    ...document,
-                    teams: document.teams.map((entry) =>
-                      entry.teamNo === updated.teamNo ? updated : entry,
-                    ),
-                  })
-                }
-              />
               <input
                 type="text"
                 aria-label={`Team ${team.teamNo} name`}
                 maxLength={24}
-                className="border-border bg-background rounded border px-2 py-1.5 text-sm font-semibold"
+                className="border-border bg-background rounded border px-3 py-1.5 text-sm font-semibold"
                 value={team.name}
                 onChange={(event) => patch(team.teamNo, { name: event.target.value })}
               />

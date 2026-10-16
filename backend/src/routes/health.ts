@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION } from '@cdf/shared';
+import { ingestSourceKindSchema, PROTOCOL_VERSION } from '@cdf/shared';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import { config } from '../config.js';
@@ -8,7 +8,7 @@ const healthResponseSchema = z.object({
   status: z.literal('ok'),
   version: z.string(),
   protocolVersion: z.number().int(),
-  ingestSource: z.enum(['mock', 'pcob']),
+  ingestSource: ingestSourceKindSchema,
   uptimeSeconds: z.number(),
 });
 

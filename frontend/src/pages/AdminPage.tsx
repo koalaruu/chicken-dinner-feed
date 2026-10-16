@@ -8,12 +8,14 @@ import type {
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { TeamEliminatedPopup } from '@/components/overlay/TeamEliminatedPopup';
 import { Toaster } from '@/components/Toaster';
 import { AppearanceEditor } from '@/features/admin/AppearanceEditor';
 import { FontManager } from '@/features/admin/FontManager';
 import { ImportExport } from '@/features/admin/ImportExport';
 import { ImportIniButton } from '@/features/admin/ImportIniButton';
 import { InstanceToolbar } from '@/features/admin/InstanceToolbar';
+import { ManualMatchControl } from '@/features/admin/ManualMatchControl';
 import { CopyableUrl } from '@/features/admin/CopyableUrl';
 import { OnAirBadge } from '@/features/admin/OnAirBadge';
 import { OverlayPreview } from '@/features/admin/OverlayPreview';
@@ -29,7 +31,14 @@ import { toInstanceId } from '@/lib/instance-id';
 import { useLiveStore } from '@/stores/live-store';
 import { toast } from '@/stores/toast-store';
 
-type Tab = 'overlays' | 'teams' | 'scoring' | 'fonts' | 'series' | 'importExport';
+type Tab =
+  | 'overlays'
+  | 'liveMatch'
+  | 'teams'
+  | 'scoring'
+  | 'fonts'
+  | 'series'
+  | 'importExport';
 
 const SIDEBAR_STORAGE_KEY = 'cdf.admin.sidebar';
 
@@ -229,6 +238,7 @@ export function AdminPage() {
        * broadcast surface, and a toast appearing there would go out on air.
        */}
       <Toaster />
+      <TeamEliminatedPopup />
 
       <ConfirmDialog
         open={pendingDelete !== null}
@@ -290,6 +300,7 @@ export function AdminPage() {
           {(
             [
               ['overlays', 'Overlays'],
+              ['liveMatch', 'Live Control'],
               ['teams', 'Teams'],
               ['scoring', 'Scoring'],
               ['fonts', 'Fonts'],
@@ -569,6 +580,8 @@ export function AdminPage() {
             </button>
           </div>
         )}
+
+        {tab === 'liveMatch' && <ManualMatchControl />}
 
         {tab === 'series' && <SeriesControl />}
 

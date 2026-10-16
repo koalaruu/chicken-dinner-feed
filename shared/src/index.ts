@@ -60,8 +60,12 @@ export {
   overlayAppearanceSchema,
   overlayInstanceIdSchema,
   overlayInstanceSchema,
+  overlayInstanceTypeSchema,
   overlayInstancesDocumentSchema,
   DEFAULT_OVERLAY_APPEARANCE,
+  DEFAULT_TOP4_APPEARANCE,
+  DEFAULT_ELIMINATION_APPEARANCE,
+  DEFAULT_POSTGAME_APPEARANCE,
   DEFAULT_OVERLAY_INSTANCES,
 } from './config/overlay-instance.js';
 export type {
@@ -72,6 +76,7 @@ export type {
   OverlayRowAnimation,
   OverlayAppearance,
   OverlayInstance,
+  OverlayInstanceType,
   OverlayInstancesDocument,
 } from './config/overlay-instance.js';
 

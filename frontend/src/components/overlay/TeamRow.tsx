@@ -6,6 +6,7 @@ import { LEADERBOARD_METRICS as M, u } from './overlay-scale';
 export interface TeamRowProps {
   team: Team;
   isAlternate: boolean;
+  displayRank?: number;
 }
 
 /** A number that draws attention to itself when it changes, without moving the layout. */
@@ -23,7 +24,7 @@ function CountingValue({ value }: { value: number }) {
   );
 }
 
-export function TeamRow({ team, isAlternate }: TeamRowProps) {
+export function TeamRow({ team, isAlternate, displayRank }: TeamRowProps) {
   return (
     <motion.div
       // `layout` is what animates a team physically sliding past another as the standings change.
@@ -34,7 +35,7 @@ export function TeamRow({ team, isAlternate }: TeamRowProps) {
       style={{
         height: u(M.rowHeight),
         paddingInline: u(M.paddingX),
-        gridTemplateColumns: `${u(M.rankColumn)} ${u(M.logoColumn)} 1fr ${u(M.aliveColumn)} ${u(M.pointsColumn)} ${u(M.elimsColumn)}`,
+        gridTemplateColumns: `${u(M.rankColumn)} 1fr ${u(M.aliveColumn)} ${u(M.pointsColumn)} ${u(M.elimsColumn)}`,
         columnGap: u(6),
         backgroundColor: isAlternate ? 'var(--overlay-row-alt-bg)' : 'transparent',
         // Eliminated teams recede rather than disappear — the director still needs to see where a
@@ -50,31 +51,8 @@ export function TeamRow({ team, isAlternate }: TeamRowProps) {
         className="font-semibold tabular-nums"
         style={{ fontSize: u(17), color: 'var(--overlay-text)' }}
       >
-        {team.rank}
+        {displayRank ?? team.rank}
       </span>
-
-      <div className="flex items-center justify-center" style={{ height: u(M.logoColumn) }}>
-        {team.logoUrl ? (
-          <img
-            src={team.logoUrl}
-            alt=""
-            style={{ width: u(M.logoColumn), height: u(M.logoColumn) }}
-          />
-        ) : (
-          // Placeholder until team logos are configurable, so the column keeps its width and the
-          // layout does not shift when logos arrive.
-          <div
-            style={{
-              width: u(M.logoColumn - 6),
-              height: u(M.logoColumn - 6),
-              borderRadius: u(3),
-              backgroundColor: 'var(--overlay-row-alt-bg)',
-              border: `${u(1)} solid var(--overlay-text-muted)`,
-              opacity: 0.5,
-            }}
-          />
-        )}
-      </div>
 
       <span
         className="truncate font-bold tracking-wide"

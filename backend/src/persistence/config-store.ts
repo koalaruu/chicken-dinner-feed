@@ -96,6 +96,23 @@ export class ConfigStore {
     await this.teams.load();
     await this.scoring.load();
     await this.fonts.load();
+
+    const toAdd: OverlayInstance[] = [];
+    if (!this.findInstance('top4')) {
+      const top4Default = DEFAULT_OVERLAY_INSTANCES.instances.find((i) => i.id === 'top4');
+      if (top4Default) toAdd.push(top4Default);
+    }
+    if (!this.findInstance('elimination')) {
+      const elimDefault = DEFAULT_OVERLAY_INSTANCES.instances.find((i) => i.id === 'elimination');
+      if (elimDefault) toAdd.push(elimDefault);
+    }
+    if (!this.findInstance('postgame')) {
+      const postgameDefault = DEFAULT_OVERLAY_INSTANCES.instances.find((i) => i.id === 'postgame');
+      if (postgameDefault) toAdd.push(postgameDefault);
+    }
+    if (toAdd.length > 0) {
+      await this.saveInstances([...this.instances.current.instances, ...toAdd]);
+    }
   }
 
   findInstance(instanceId: string): OverlayInstance | null {

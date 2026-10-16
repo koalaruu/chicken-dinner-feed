@@ -107,15 +107,19 @@ export const overlayInstanceIdSchema = z
     'Use 1–32 lowercase letters, digits or hyphens, starting with a letter or digit.',
   );
 
+export const overlayInstanceTypeSchema = z.enum([
+  'leaderboard',
+  'top4',
+  'elimination',
+  'postgame',
+]);
+export type OverlayInstanceType = z.infer<typeof overlayInstanceTypeSchema>;
+
 export const overlayInstanceSchema = z.object({
   id: overlayInstanceIdSchema,
   /** Operator-facing label. The id is what goes in URLs. */
   name: z.string().min(1).max(60),
-  /**
-   * Overlay type. A registry of one for now; deliberately not generalised until there are two to
-   * generalise from.
-   */
-  type: z.literal('leaderboard'),
+  type: overlayInstanceTypeSchema,
   appearance: overlayAppearanceSchema,
 });
 export type OverlayInstance = z.infer<typeof overlayInstanceSchema>;
@@ -156,6 +160,93 @@ export const DEFAULT_OVERLAY_APPEARANCE: OverlayAppearance = {
   maxTeams: 16,
 };
 
+export const DEFAULT_TOP4_APPEARANCE: OverlayAppearance = {
+  ...DEFAULT_OVERLAY_APPEARANCE,
+  anchor: 'left',
+  offsetX: 0,
+  offsetY: 24,
+  scale: 1,
+  colors: {
+    background: '#18120e',
+    headerBackground: '#f5c553',
+    rowAltBackground: '#16252c',
+    text: '#ffffff',
+    textMuted: '#e5a93c',
+    accent: '#d49b35',
+    playerAlive: '#ffd24c',
+    playerKnocked: '#f5a524',
+    playerDead: '#38383f',
+  },
+  animation: {
+    type: 'slide',
+    direction: 'top',
+    durationMs: 450,
+    easing: 'smooth',
+    withFade: true,
+    rows: { enabled: false, staggerMs: 60, reverseOnHide: false },
+  },
+  showLegend: false,
+  maxTeams: 4,
+};
+
+export const DEFAULT_ELIMINATION_APPEARANCE: OverlayAppearance = {
+  ...DEFAULT_OVERLAY_APPEARANCE,
+  anchor: 'right',
+  offsetX: 32,
+  offsetY: 180,
+  scale: 1,
+  colors: {
+    background: '#18120e',
+    headerBackground: '#dc2626',
+    rowAltBackground: '#16252c',
+    text: '#ffffff',
+    textMuted: '#e5a93c',
+    accent: '#d49b35',
+    playerAlive: '#ffd24c',
+    playerKnocked: '#f5a524',
+    playerDead: '#38383f',
+  },
+  animation: {
+    type: 'slide',
+    direction: 'right',
+    durationMs: 400,
+    easing: 'snappy',
+    withFade: true,
+    rows: { enabled: false, staggerMs: 60, reverseOnHide: false },
+  },
+  showLegend: false,
+  maxTeams: 1,
+};
+
+export const DEFAULT_POSTGAME_APPEARANCE: OverlayAppearance = {
+  ...DEFAULT_OVERLAY_APPEARANCE,
+  anchor: 'left',
+  offsetX: 0,
+  offsetY: 0,
+  scale: 1,
+  colors: {
+    background: '#18120e',
+    headerBackground: '#f5c553',
+    rowAltBackground: '#16252c',
+    text: '#ffffff',
+    textMuted: '#e5a93c',
+    accent: '#d49b35',
+    playerAlive: '#ffd24c',
+    playerKnocked: '#f5a524',
+    playerDead: '#38383f',
+  },
+  animation: {
+    type: 'fade',
+    direction: 'top',
+    durationMs: 500,
+    easing: 'smooth',
+    withFade: true,
+    rows: { enabled: true, staggerMs: 40, reverseOnHide: false },
+  },
+  showLegend: false,
+  maxTeams: 16,
+};
+
 export const DEFAULT_OVERLAY_INSTANCES: OverlayInstancesDocument = {
   schemaVersion: CONFIG_SCHEMA_VERSION,
   instances: [
@@ -164,6 +255,24 @@ export const DEFAULT_OVERLAY_INSTANCES: OverlayInstancesDocument = {
       name: 'Main leaderboard',
       type: 'leaderboard',
       appearance: DEFAULT_OVERLAY_APPEARANCE,
+    },
+    {
+      id: 'top4',
+      name: 'Top 4 HUD (Horizontal)',
+      type: 'top4',
+      appearance: DEFAULT_TOP4_APPEARANCE,
+    },
+    {
+      id: 'elimination',
+      name: 'Team Elimination Alert',
+      type: 'elimination',
+      appearance: DEFAULT_ELIMINATION_APPEARANCE,
+    },
+    {
+      id: 'postgame',
+      name: 'Postgame Match Standings',
+      type: 'postgame',
+      appearance: DEFAULT_POSTGAME_APPEARANCE,
     },
   ],
 };

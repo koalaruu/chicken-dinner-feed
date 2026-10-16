@@ -3,8 +3,12 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState, type CSSProperties } from 'react';
 import { appearanceToAnimation, appearanceToPosition } from '@/components/overlay/appearance';
 import { LeaderboardOverlay } from '@/components/overlay/LeaderboardOverlay';
+import { PostgameOverlay } from '@/components/overlay/PostgameOverlay';
+import { TeamEliminatedPopup } from '@/components/overlay/TeamEliminatedPopup';
+import { Top4Overlay } from '@/components/overlay/Top4Overlay';
 import { u } from '@/components/overlay/overlay-scale';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useEliminationWatcher } from '@/hooks/useEliminationWatcher';
 import { useLiveStore } from '@/stores/live-store';
 
 export interface OverlayPageProps {
@@ -63,6 +67,10 @@ export function OverlayPage({ instanceId }: OverlayPageProps) {
   // unconfigured overlay is still identifiable by the address it was opened with.
   useDocumentTitle(instance?.name ?? instanceId);
 
+  // Automatically watches for newly eliminated teams to show popups.
+  // Must be called unconditionally before any early returns to satisfy React Rules of Hooks.
+  useEliminationWatcher(snapshot?.match);
+
   if (protocolMismatch !== null) {
     // Deliberately visible rather than silent (ADR-0007). A browser source left open across an
     // upgrade would otherwise render subtly wrong data, which is worse than an obvious error.
@@ -93,11 +101,70 @@ export function OverlayPage({ instanceId }: OverlayPageProps) {
   // An unconfigured id still renders, using the defaults. Showing nothing would look identical to a
   // broken connection, and the operator has no way to tell them apart mid-broadcast.
   const appearance = instance?.appearance ?? DEFAULT_OVERLAY_APPEARANCE;
+  const isTop4 = instance?.type === 'top4' || instanceId === 'top4';
+  const isEliminationOnly = instance?.type === 'elimination' || instanceId === 'elimination';
+  const isPostgame = instance?.type === 'postgame' || instanceId === 'postgame';
+
+  if (isEliminationOnly) {
+    return (
+      <>
+        {isPreview && <div style={PREVIEW_BACKDROP} aria-hidden />}
+        <TeamEliminatedPopup />
+      </>
+    );
+  }
+
+  if (isPostgame) {
+    return (
+      <>
+        {isPreview && <div style={PREVIEW_BACKDROP} aria-hidden />}
+        <AnimatePresence initial={false}>
+          {overlay.visible && (
+            <motion.div
+              key="postgame-panel"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.4 }}
+              className="w-screen h-screen"
+            >
+              <PostgameOverlay match={snapshot.match} appearance={appearance} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </>
+    );
+  }
+
+  if (isTop4) {
+    return (
+      <>
+        {isPreview && <div style={PREVIEW_BACKDROP} aria-hidden />}
+        <TeamEliminatedPopup />
+        <AnimatePresence initial={false}>
+          {overlay.visible && (
+            <motion.div
+              key="top4-panel"
+              initial={{ y: -80, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -80, opacity: 0 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Top4Overlay match={snapshot.match} appearance={appearance} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </>
+    );
+  }
+
   const animation = appearanceToAnimation(appearance);
 
   return (
     <>
       {isPreview && <div style={PREVIEW_BACKDROP} aria-hidden />}
+
+      <TeamEliminatedPopup />
 
       <div style={appearanceToPosition(appearance)}>
         {/*

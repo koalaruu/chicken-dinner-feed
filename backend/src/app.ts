@@ -13,7 +13,7 @@ import {
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod';
 import { config } from './config.js';
-import { createIngestSource } from './ingest/index.js';
+import { createIngestSource, ManualSource } from './ingest/index.js';
 import { ConfigStore } from './persistence/config-store.js';
 import { FontStore, MAX_FONT_BYTES } from './persistence/font-store.js';
 import { LogoStore, MAX_LOGO_BYTES } from './persistence/logo-store.js';
@@ -23,6 +23,7 @@ import { feedbackRoutes } from './routes/feedback.js';
 import { fontRoutes } from './routes/fonts.js';
 import { logoRoutes } from './routes/logos.js';
 import { healthRoutes } from './routes/health.js';
+import { manualRoutes } from './routes/manual.js';
 import { overlayControlRoutes } from './routes/overlay-control.js';
 import { seriesRoutes } from './routes/series.js';
 import { MatchStore } from './state/match-store.js';
@@ -168,6 +169,11 @@ export async function buildApp(): Promise<AppContext> {
   }
 
   await app.register(healthRoutes, { prefix: '/api' });
+  await app.register(manualRoutes, {
+    prefix: '/api',
+    manualSource: ingestSource instanceof ManualSource ? ingestSource : null,
+    currentSource: config.ingestSource,
+  });
   await app.register(overlayControlRoutes, {
     prefix: '/api',
     store: overlayControl,

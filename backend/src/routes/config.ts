@@ -2,6 +2,7 @@ import {
   DEFAULT_OVERLAY_APPEARANCE,
   overlayInstanceIdSchema,
   overlayInstanceSchema,
+  overlayInstanceTypeSchema,
   overlayInstancesDocumentSchema,
   scoringRulesetSchema,
   teamRosterDocumentSchema,
@@ -23,6 +24,7 @@ const errorSchema = z.object({ error: z.string() });
 const createInstanceSchema = z.object({
   id: overlayInstanceIdSchema,
   name: z.string().min(1).max(60),
+  type: overlayInstanceTypeSchema.optional(),
   /** Copy another instance's look — the usual way a second overlay is made. */
   copyAppearanceFrom: overlayInstanceIdSchema.optional(),
 });
@@ -70,7 +72,7 @@ export const configRoutes: FastifyPluginAsyncZod<ConfigRoutesOptions> = async (a
       const created = {
         id,
         name,
-        type: 'leaderboard' as const,
+        type: request.body.type ?? ('leaderboard' as const),
         appearance: source?.appearance ?? DEFAULT_OVERLAY_APPEARANCE,
       };
 

@@ -35,8 +35,8 @@ const envSchema = z.object({
   DATA_DIR: z.string().min(1).default('./data'),
   STATIC_DIR: z.string().min(1).optional(),
 
-  /** See ADR-0006. `mock` needs no game running; `pcob` polls the real observer API. */
-  INGEST_SOURCE: z.enum(['mock', 'pcob']).default('pcob'),
+  /** See ADR-0006. `mock` needs no game; `pcob` polls API; `manual` is controlled from admin. */
+  INGEST_SOURCE: z.enum(['mock', 'pcob', 'manual']).default('pcob'),
 
   /**
    * Where the PCOB API answers.

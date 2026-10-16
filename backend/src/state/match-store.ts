@@ -301,6 +301,9 @@ export class MatchStore {
       if (standingCount === 0 && !this.eliminated.has(teamNo)) {
         this.eliminated.add(teamNo);
         this.eliminationOrder.push(teamNo);
+      } else if (standingCount > 0 && this.eliminated.has(teamNo)) {
+        this.eliminated.delete(teamNo);
+        this.eliminationOrder = this.eliminationOrder.filter((no) => no !== teamNo);
       }
     }
   }

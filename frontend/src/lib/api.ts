@@ -47,9 +47,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (!response.ok) {
     const body: unknown = await response.json().catch(() => null);
     const message =
-      body && typeof body === 'object' && 'error' in body && typeof body.error === 'string'
-        ? body.error
-        : `Request failed (HTTP ${response.status})`;
+      body && typeof body === 'object' && 'message' in body && typeof body.message === 'string'
+        ? body.message
+        : body && typeof body === 'object' && 'error' in body && typeof body.error === 'string'
+          ? body.error
+          : `Request failed (HTTP ${response.status})`;
     const errors =
       body && typeof body === 'object' && 'errors' in body && Array.isArray(body.errors)
         ? (body.errors as string[])
@@ -173,4 +175,81 @@ export const api = {
       { method: 'POST', body },
     );
   },
+
+  getManualState: () =>
+    request<{
+      enabled: boolean;
+      currentSource: string;
+      state: {
+        matchId: string | null;
+        phase: 'idle' | 'live' | 'ended';
+        teams: {
+          teamNo: number;
+          aliveCount: number;
+          kills: number;
+          isEliminated: boolean;
+        }[];
+      } | null;
+    }>('/manual/state'),
+
+  startManualMatch: (matchId?: string) =>
+    request<{
+      matchId: string | null;
+      phase: 'idle' | 'live' | 'ended';
+      teams: {
+        teamNo: number;
+        aliveCount: number;
+        kills: number;
+        isEliminated: boolean;
+      }[];
+    }>('/manual/start', {
+      method: 'POST',
+      body: JSON.stringify(matchId ? { matchId } : {}),
+    }),
+
+  endManualMatch: () =>
+    request<{
+      matchId: string | null;
+      phase: 'idle' | 'live' | 'ended';
+      teams: {
+        teamNo: number;
+        aliveCount: number;
+        kills: number;
+        isEliminated: boolean;
+      }[];
+    }>('/manual/end', { method: 'POST' }),
+
+  resetManualMatch: () =>
+    request<{
+      matchId: string | null;
+      phase: 'idle' | 'live' | 'ended';
+      teams: {
+        teamNo: number;
+        aliveCount: number;
+        kills: number;
+        isEliminated: boolean;
+      }[];
+    }>('/manual/reset', { method: 'POST' }),
+
+  updateManualTeam: (params: {
+    teamNo: number;
+    kills?: number;
+    deltaKills?: number;
+    aliveCount?: number;
+    eliminate?: boolean;
+    revive?: boolean;
+  }) =>
+    request<{
+      matchId: string | null;
+      phase: 'idle' | 'live' | 'ended';
+      teams: {
+        teamNo: number;
+        aliveCount: number;
+        kills: number;
+        isEliminated: boolean;
+      }[];
+    }>('/manual/team', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    }),
 };

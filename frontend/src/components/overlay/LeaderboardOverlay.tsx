@@ -32,8 +32,32 @@ export function LeaderboardOverlay({
   appearance,
   animateRows = false,
 }: LeaderboardOverlayProps) {
-  const columns = `${u(M.rankColumn)} ${u(M.logoColumn)} 1fr ${u(M.aliveColumn)} ${u(M.pointsColumn)} ${u(M.elimsColumn)}`;
-  const teams = match.teams.slice(0, appearance.maxTeams);
+  const columns = `${u(M.rankColumn)} 1fr ${u(M.aliveColumn)} ${u(M.pointsColumn)} ${u(M.elimsColumn)}`;
+
+  // Wiped-out (eliminated) teams are placed at the bottom of the overlay
+  const sortedTeams = [...match.teams].sort((a, b) => {
+    // 1. Teams that have appeared come before teams that have never appeared
+    if (a.hasAppeared !== b.hasAppeared) {
+      return Number(b.hasAppeared) - Number(a.hasAppeared);
+    }
+
+    // 2. Alive teams first, eliminated (wiped out) teams at the bottom
+    if (a.isEliminated !== b.isEliminated) {
+      return Number(a.isEliminated) - Number(b.isEliminated);
+    }
+
+    // 3. Among eliminated teams: order by placement so earliest wiped team (e.g. 16th) is at the bottom
+    if (a.isEliminated && b.isEliminated) {
+      if (a.placement !== null && b.placement !== null && a.placement !== b.placement) {
+        return a.placement - b.placement;
+      }
+    }
+
+    // 4. Default: keep server ranking / points order
+    return a.rank - b.rank;
+  });
+
+  const teams = sortedTeams.slice(0, appearance.maxTeams);
 
   return (
     <div
@@ -68,8 +92,6 @@ export function LeaderboardOverlay({
         }}
       >
         <span className="font-bold">#</span>
-        {/* The logo column has no heading; TEAM labels the name column beside it. */}
-        <span />
         <span className="font-bold">TEAM</span>
         <span className="text-center font-bold">ALIVE</span>
         <span className="text-center font-bold">PTS</span>
@@ -85,10 +107,19 @@ export function LeaderboardOverlay({
              * two opacities simply multiply, which is the behaviour we want anyway.
              */
             <motion.div key={team.teamNo} variants={ROW_VARIANTS}>
-              <TeamRow team={team} isAlternate={index % 2 === 1} />
+              <TeamRow
+                team={team}
+                displayRank={index + 1}
+                isAlternate={index % 2 === 1}
+              />
             </motion.div>
           ) : (
-            <TeamRow key={team.teamNo} team={team} isAlternate={index % 2 === 1} />
+            <TeamRow
+              key={team.teamNo}
+              team={team}
+              displayRank={index + 1}
+              isAlternate={index % 2 === 1}
+            />
           ),
         )}
       </div>
