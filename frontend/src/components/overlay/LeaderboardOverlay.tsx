@@ -66,8 +66,11 @@ export function LeaderboardOverlay({
         width: u(M.panelWidth),
         backgroundColor: 'var(--overlay-bg)',
         fontFamily: 'var(--overlay-font-family)',
-        borderRadius: u(4),
+        borderRadius: u(6),
         overflow: 'hidden',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.85), 0 0 16px rgba(245, 197, 83, 0.2)',
+        border: `${u(1)} solid rgba(245, 197, 83, 0.35)`,
+        backdropFilter: 'blur(10px)',
       }}
     >
       {/*
@@ -76,6 +79,45 @@ export function LeaderboardOverlay({
        * for when they wanted branded and generic versions of the same data.
        */}
       <div style={{ height: u(M.accentBarHeight), backgroundColor: 'var(--overlay-accent)' }} />
+
+      {/* Tournament Branding Sub-Header */}
+      <div
+        className="flex items-center justify-between"
+        style={{
+          height: u(26),
+          paddingInline: u(M.paddingX),
+          backgroundColor: 'var(--overlay-header-bg)',
+          borderBottom: `${u(1)} solid rgba(245, 197, 83, 0.25)`,
+        }}
+      >
+        <div className="flex items-center gap-1.5">
+          <span
+            className="font-black uppercase tracking-wider text-[10px]"
+            style={{ color: 'var(--overlay-accent)' }}
+          >
+            PMCC INDONESIA 2024
+          </span>
+          <span className="font-semibold text-white/50 text-[9px] uppercase tracking-wide">
+            • STANDINGS
+          </span>
+        </div>
+        {match.matchId ? (
+          <span
+            className="font-bold uppercase tracking-wider text-[9px] px-1.5 py-0.5 rounded"
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              color: 'var(--overlay-accent)',
+              border: `${u(1)} solid rgba(245, 197, 83, 0.3)`,
+            }}
+          >
+            MATCH {match.matchId}
+          </span>
+        ) : (
+          <span className="font-bold text-[9px] text-white/60 tracking-wider uppercase">
+            LIVE
+          </span>
+        )}
+      </div>
 
       <div
         className="grid items-center"

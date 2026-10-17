@@ -25,6 +25,9 @@ function CountingValue({ value }: { value: number }) {
 }
 
 export function TeamRow({ team, isAlternate, displayRank }: TeamRowProps) {
+  const currentRank = displayRank ?? team.rank;
+  const isLeader = currentRank === 1 && !team.isEliminated;
+
   return (
     <motion.div
       // `layout` is what animates a team physically sliding past another as the standings change.
@@ -37,26 +40,37 @@ export function TeamRow({ team, isAlternate, displayRank }: TeamRowProps) {
         paddingInline: u(M.paddingX),
         gridTemplateColumns: `${u(M.rankColumn)} 1fr ${u(M.aliveColumn)} ${u(M.pointsColumn)} ${u(M.elimsColumn)}`,
         columnGap: u(6),
-        backgroundColor: isAlternate ? 'var(--overlay-row-alt-bg)' : 'transparent',
+        backgroundColor: isLeader
+          ? 'rgba(245, 197, 83, 0.16)'
+          : isAlternate
+            ? 'var(--overlay-row-alt-bg)'
+            : 'transparent',
+        borderLeft: isLeader ? `${u(3)} solid var(--overlay-accent)` : `${u(3)} solid transparent`,
         // Eliminated teams recede rather than disappear — the director still needs to see where a
         // team finished. A team that has never actually shown up this match recedes further still:
         // it is a roster slot nobody has played, not a competitor, and must read as visibly
         // different from "alive, just no data yet" (which renders identically otherwise — full,
         // undimmed bars — see AlivePlayerBars' `fillFraction`).
         opacity: !team.hasAppeared ? 0.25 : team.isEliminated ? 0.45 : 1,
-        transition: 'opacity 400ms ease',
+        transition: 'opacity 400ms ease, background-color 300ms ease',
       }}
     >
       <span
-        className="font-semibold tabular-nums"
-        style={{ fontSize: u(17), color: 'var(--overlay-text)' }}
+        className="font-bold tabular-nums"
+        style={{
+          fontSize: u(17),
+          color: isLeader ? 'var(--overlay-accent)' : 'var(--overlay-text)',
+        }}
       >
-        {displayRank ?? team.rank}
+        {currentRank}
       </span>
 
       <span
         className="truncate font-bold tracking-wide"
-        style={{ fontSize: u(16), color: 'var(--overlay-text)' }}
+        style={{
+          fontSize: u(16),
+          color: isLeader ? 'var(--overlay-accent)' : 'var(--overlay-text)',
+        }}
       >
         {team.name}
       </span>
@@ -66,8 +80,11 @@ export function TeamRow({ team, isAlternate, displayRank }: TeamRowProps) {
       </div>
 
       <span
-        className="text-center font-semibold"
-        style={{ fontSize: u(16), color: 'var(--overlay-text)' }}
+        className="text-center font-bold"
+        style={{
+          fontSize: u(16),
+          color: isLeader ? 'var(--overlay-accent)' : 'var(--overlay-text)',
+        }}
       >
         <CountingValue value={team.totalPoints} />
       </span>

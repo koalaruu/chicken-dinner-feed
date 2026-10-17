@@ -15,7 +15,7 @@ export function u(designPixels: number): string {
 
 /** Layout constants for the leaderboard, in design-canvas pixels. Mirrors `specs/example.png`. */
 export const LEADERBOARD_METRICS = {
-  panelWidth: 340,
+  panelWidth: 360,
   paddingX: 10,
   /** The accent strip along the top of the panel — the overlay's branding colour. */
   accentBarHeight: 3,
