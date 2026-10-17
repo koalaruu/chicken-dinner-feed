@@ -45,11 +45,6 @@ const PREVIEW_BACKDROP: CSSProperties = {
 export function OverlayPage({ instanceId }: OverlayPageProps) {
   // Read once: the address does not change while the page is open.
   const [isPreview] = useState(() => new URLSearchParams(window.location.search).has('preview'));
-  const [hasNoBg] = useState(
-    () =>
-      new URLSearchParams(window.location.search).has('nobg') ||
-      new URLSearchParams(window.location.search).has('transparent'),
-  );
 
   const snapshot = useLiveStore((state) => state.snapshot);
   const overlay = useLiveStore((state) => state.overlayStates[instanceId]);
@@ -167,81 +162,7 @@ export function OverlayPage({ instanceId }: OverlayPageProps) {
 
   return (
     <>
-      {isPreview && <div style={{ ...PREVIEW_BACKDROP, zIndex: -20 }} aria-hidden />}
-
-      {!hasNoBg && (
-        <AnimatePresence initial={false}>
-          {overlay.visible && (
-            <motion.div
-              key="leaderboard-stage-bg"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.45 }}
-              className="fixed inset-0 pointer-events-none -z-10 overflow-hidden"
-            >
-              {/* 3D Background from PMCC stage */}
-              <div
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: "url('/images/postgame-bg.png')" }}
-              />
-
-              {/* Atmospheric Overlays: Dark gradient to preserve central trophy and keep left leaderboard table crisp */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/75" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent" />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    'radial-gradient(ellipse at 50% 50%, rgba(24, 18, 14, 0.2) 0%, rgba(10, 8, 6, 0.65) 75%, rgba(0, 0, 0, 0.9) 100%)',
-                }}
-              />
-
-              {/* Top PMCC Championship Bar */}
-              <div className="absolute top-4 left-6 right-6 flex items-center justify-between">
-                <div className="flex items-center gap-3 px-3.5 py-1.5 rounded-lg bg-black/60 backdrop-blur-md border border-[#f5c553]/40 shadow-lg">
-                  <div className="flex items-center justify-center size-7 rounded bg-gradient-to-br from-[#f5c553] to-[#d49b35] text-[#18110a] font-black text-xs shadow">
-                    <svg className="size-4 text-[#18110a]" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2l2.4 7.4h7.6l-6.2 4.5 2.4 7.4-6.2-4.5-6.2 4.5 2.4-7.4-6.2-4.5h7.6z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#ffd24c]">
-                      PMCC INDONESIA 2024
-                    </span>
-                    <h2 className="text-xs font-black uppercase tracking-wider text-white">
-                      LIVE MATCH LEADERBOARD
-                    </h2>
-                  </div>
-                </div>
-
-                {snapshot.match.matchId && (
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-md border border-[#f5c553]/40 text-xs font-black text-[#ffd24c] shadow-lg">
-                    <span>MATCH {snapshot.match.matchId}</span>
-                    <span className="text-white/40">•</span>
-                    <span className="text-white/80 font-bold uppercase text-[10px]">
-                      {snapshot.match.phase === 'ended' ? 'FINAL' : 'LIVE'}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Bottom Championship Watermark */}
-              <div className="absolute bottom-3 left-6 right-6 flex items-center justify-between px-5 py-1.5 rounded-lg bg-black/50 backdrop-blur-md border border-[#f5c553]/25 text-white/70 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="size-2 rounded-full bg-[#f5c553] animate-pulse" />
-                  <span className="font-bold text-white/90 tracking-wide uppercase text-[11px]">
-                    PUBG MOBILE CAMPUS CHALLENGE
-                  </span>
-                </div>
-                <div className="font-black text-[#ffd24c] tracking-widest uppercase text-[10px]">
-                  #BE THE ONE
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      )}
+      {isPreview && <div style={PREVIEW_BACKDROP} aria-hidden />}
 
       <TeamEliminatedPopup />
 
