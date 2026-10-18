@@ -12,15 +12,13 @@ interface PostgameOverlayProps {
 export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverlayProps) {
   const [mode, setMode] = useState<'match' | 'series'>(defaultMode);
 
-  // Teams sorted by rank (1 to 16)
+  // Teams sorted by rank (displays all teams)
   const sortedTeams = [...match.teams].sort((a, b) => a.rank - b.rank);
 
-  const top8 = sortedTeams.slice(0, 8);
-  const bottom8 = sortedTeams.slice(8, 16);
-
-  // If fewer than 16 teams, distribute evenly
-  const leftTeams = sortedTeams.length > 8 ? top8 : sortedTeams;
-  const rightTeams = sortedTeams.length > 8 ? bottom8 : [];
+  // Distribute all teams evenly into left and right columns
+  const half = Math.ceil(sortedTeams.length / 2);
+  const leftTeams = sortedTeams.slice(0, half);
+  const rightTeams = sortedTeams.slice(half);
 
   const winner = sortedTeams[0];
 
@@ -74,7 +72,7 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
               {match.matchId ? `MATCH: ${match.matchId}` : 'MATCH COMPLETED'}
             </span>
             <span className="text-zinc-500">&bull;</span>
-            <span className="text-xs font-semibold text-white/80">16 TEAMS</span>
+            <span className="text-xs font-semibold text-white/80">{sortedTeams.length} TEAMS</span>
             <span className="text-zinc-500">&bull;</span>
             <span className="text-xs font-bold text-[#2bb0b8] uppercase">
               {match.phase === 'ended' ? 'FINAL RESULTS' : 'LIVE ACCUMULATED'}
@@ -105,9 +103,9 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
 
         {/* CENTER TABLES SECTION: 2 Columns framing the Golden Trophy in the Center */}
         <div className="flex-1 flex items-stretch justify-between gap-6 my-3 min-h-0">
-          {/* LEFT COLUMN: Ranks 1 to 8 */}
+          {/* LEFT COLUMN */}
           <div className="flex-1 flex flex-col justify-between max-w-[48%] bg-black/60 backdrop-blur-md rounded-xl p-3 border border-[#d49b35]/40 shadow-[0_8px_32px_rgba(0,0,0,0.85)]">
-            <TableHeader label="TOP 8 SURVIVORS" />
+            <TableHeader label={leftTeams.length > 0 ? `RANKS 1 - ${leftTeams.length}` : 'STANDINGS'} />
             <div className="flex-1 flex flex-col justify-between gap-1.5 mt-2 overflow-hidden">
               <AnimatePresence initial={false}>
                 {leftTeams.map((team, index) => (
@@ -115,7 +113,7 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
                     key={team.teamNo}
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.04, duration: 0.3 }}
+                    transition={{ delay: index * 0.03, duration: 0.3 }}
                     className="flex-1 min-h-0"
                   >
                     <TeamRowCard team={team} isWinner={team.rank === 1} />
@@ -142,9 +140,15 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
             )}
           </div>
 
-          {/* RIGHT COLUMN: Ranks 9 to 16 */}
+          {/* RIGHT COLUMN */}
           <div className="flex-1 flex flex-col justify-between max-w-[48%] bg-black/60 backdrop-blur-md rounded-xl p-3 border border-[#d49b35]/40 shadow-[0_8px_32px_rgba(0,0,0,0.85)]">
-            <TableHeader label="RANKS 9 - 16" />
+            <TableHeader
+              label={
+                rightTeams.length > 0
+                  ? `RANKS ${leftTeams.length + 1} - ${sortedTeams.length}`
+                  : ''
+              }
+            />
             <div className="flex-1 flex flex-col justify-between gap-1.5 mt-2 overflow-hidden">
               <AnimatePresence initial={false}>
                 {rightTeams.map((team, index) => (
@@ -152,7 +156,7 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
                     key={team.teamNo}
                     initial={{ opacity: 0, x: 30 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: (index + 8) * 0.04, duration: 0.3 }}
+                    transition={{ delay: (index + leftTeams.length) * 0.03, duration: 0.3 }}
                     className="flex-1 min-h-0"
                   >
                     <TeamRowCard team={team} isWinner={false} />

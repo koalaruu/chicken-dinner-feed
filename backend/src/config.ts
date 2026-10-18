@@ -21,7 +21,16 @@ function defaultStaticDir(): string {
 }
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  NODE_ENV: z
+    .string()
+    .optional()
+    .transform((val) => {
+      const normalized = val?.trim().toLowerCase();
+      if (normalized === 'production' || normalized === 'prod') return 'production' as const;
+      if (normalized === 'test') return 'test' as const;
+      return 'development' as const;
+    })
+    .default('development'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 
   PORT: z.coerce.number().int().min(1).max(65535).default(4317),

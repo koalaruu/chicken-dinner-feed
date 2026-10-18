@@ -239,7 +239,7 @@ export const DEFAULT_POSTGAME_APPEARANCE: OverlayAppearance = {
     rows: { enabled: true, staggerMs: 40, reverseOnHide: false },
   },
   showLegend: false,
-  maxTeams: 16,
+  maxTeams: 25,
 };
 
 export const DEFAULT_OVERLAY_INSTANCES: OverlayInstancesDocument = {
