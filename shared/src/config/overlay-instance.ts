@@ -107,12 +107,7 @@ export const overlayInstanceIdSchema = z
     'Use 1–32 lowercase letters, digits or hyphens, starting with a letter or digit.',
   );
 
-export const overlayInstanceTypeSchema = z.enum([
-  'leaderboard',
-  'top4',
-  'elimination',
-  'postgame',
-]);
+export const overlayInstanceTypeSchema = z.enum(['leaderboard', 'top4', 'elimination', 'postgame']);
 export type OverlayInstanceType = z.infer<typeof overlayInstanceTypeSchema>;
 
 export const overlayInstanceSchema = z.object({
@@ -132,7 +127,7 @@ export type OverlayInstancesDocument = z.infer<typeof overlayInstancesDocumentSc
 
 /** Approximates `specs/example.png`, so a fresh install looks right before anything is configured. */
 export const DEFAULT_OVERLAY_APPEARANCE: OverlayAppearance = {
-  anchor: 'left',
+  anchor: 'right',
   offsetX: 32,
   offsetY: null,
   scale: 1,
@@ -150,7 +145,7 @@ export const DEFAULT_OVERLAY_APPEARANCE: OverlayAppearance = {
   },
   animation: {
     type: 'slide',
-    direction: 'left',
+    direction: 'right',
     durationMs: 420,
     easing: 'smooth',
     withFade: true,
@@ -191,7 +186,7 @@ export const DEFAULT_TOP4_APPEARANCE: OverlayAppearance = {
 
 export const DEFAULT_ELIMINATION_APPEARANCE: OverlayAppearance = {
   ...DEFAULT_OVERLAY_APPEARANCE,
-  anchor: 'right',
+  anchor: 'left',
   offsetX: 32,
   offsetY: 180,
   scale: 1,
@@ -208,7 +203,7 @@ export const DEFAULT_ELIMINATION_APPEARANCE: OverlayAppearance = {
   },
   animation: {
     type: 'slide',
-    direction: 'right',
+    direction: 'left',
     durationMs: 400,
     easing: 'snappy',
     withFade: true,

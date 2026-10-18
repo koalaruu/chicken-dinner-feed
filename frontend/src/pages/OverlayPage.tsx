@@ -109,7 +109,7 @@ export function OverlayPage({ instanceId }: OverlayPageProps) {
     return (
       <>
         {isPreview && <div style={PREVIEW_BACKDROP} aria-hidden />}
-        <TeamEliminatedPopup />
+        <TeamEliminatedPopup anchor={appearance.anchor} />
       </>
     );
   }
@@ -140,7 +140,7 @@ export function OverlayPage({ instanceId }: OverlayPageProps) {
     return (
       <>
         {isPreview && <div style={PREVIEW_BACKDROP} aria-hidden />}
-        <TeamEliminatedPopup />
+        <TeamEliminatedPopup anchor="right" />
         <AnimatePresence initial={false}>
           {overlay.visible && (
             <motion.div
@@ -164,7 +164,7 @@ export function OverlayPage({ instanceId }: OverlayPageProps) {
     <>
       {isPreview && <div style={PREVIEW_BACKDROP} aria-hidden />}
 
-      <TeamEliminatedPopup />
+      <TeamEliminatedPopup anchor={appearance.anchor === 'right' ? 'left' : 'right'} />
 
       <div style={appearanceToPosition(appearance)}>
         {/*

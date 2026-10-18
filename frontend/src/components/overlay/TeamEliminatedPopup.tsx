@@ -4,7 +4,11 @@ import { useEliminationStore } from '@/stores/elimination-store';
 
 const POPUP_DURATION_MS = 4500;
 
-export function TeamEliminatedPopup() {
+export interface TeamEliminatedPopupProps {
+  anchor?: 'left' | 'right';
+}
+
+export function TeamEliminatedPopup({ anchor = 'left' }: TeamEliminatedPopupProps) {
   const current = useEliminationStore((s) => s.current);
   const dismiss = useEliminationStore((s) => s.dismiss);
 
@@ -19,7 +23,11 @@ export function TeamEliminatedPopup() {
   }, [current?.id, dismiss]);
 
   return (
-    <div className="fixed top-24 right-8 z-[9999] pointer-events-none select-none">
+    <div
+      className={`fixed top-24 ${
+        anchor === 'right' ? 'right-8' : 'left-8'
+      } z-[9999] pointer-events-none select-none`}
+    >
       <AnimatePresence mode="wait">
         {current && (
           <motion.div
