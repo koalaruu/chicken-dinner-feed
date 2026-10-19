@@ -218,6 +218,14 @@
   font-family: var(--overlay-font-family);
 }
 
+:root[data-surface='overlay'] button,
+:root[data-surface='overlay'] a,
+:root[data-surface='overlay'] [role='button'],
+:root[data-surface='overlay'] select,
+:root[data-surface='overlay'] input {
+  cursor: pointer !important;
+}
+
 /*
  * Broadcast graphics are watched, not interacted with; an operator cannot opt out of motion on
  * behalf of the audience, and suppressing overlay animation would break the product's purpose.

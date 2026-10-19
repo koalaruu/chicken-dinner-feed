@@ -24,6 +24,12 @@ export function ManualMatchControl() {
   const postgameOverlayState = useLiveStore((state) => state.overlayStates['postgame']);
   const isPostgameOnAir = postgameOverlayState?.visible ?? false;
 
+  const recapOverlayState = useLiveStore((state) => state.overlayStates['recap']);
+  const isRecapOnAir = recapOverlayState?.visible ?? false;
+
+  const wwcdOverlayState = useLiveStore((state) => state.overlayStates['wwcd']);
+  const isWwcdOnAir = wwcdOverlayState?.visible ?? false;
+
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [currentSource, setCurrentSource] = useState<string>('');
   const [manualState, setManualState] = useState<{
@@ -147,6 +153,54 @@ export function ManualMatchControl() {
     try {
       await navigator.clipboard.writeText(url);
       toast.success('URL Postgame Standings disalin ke clipboard!', url);
+    } catch {
+      toast.error('Gagal menyalin URL', url);
+    }
+  };
+
+  const handleToggleRecap = async () => {
+    try {
+      const res = await api.setOverlayVisibility('recap', 'toggle');
+      toast.success(
+        res.visible ? 'Tournament Recap (R1-R4) ON AIR' : 'Tournament Recap disembunyikan',
+        res.visible
+          ? 'Overlay Recap Round 1-4 (background PMCC 0001.png) sedang tampil di stream OBS.'
+          : 'Overlay Recap Round 1-4 sudah disembunyikan dari stream.',
+      );
+    } catch (err) {
+      toast.error('Gagal mengubah status Recap Overlay', describe(err));
+    }
+  };
+
+  const handleCopyRecapUrl = async () => {
+    const url = `${window.location.origin}/overlay/recap`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success('URL Tournament Recap disalin ke clipboard!', url);
+    } catch {
+      toast.error('Gagal menyalin URL', url);
+    }
+  };
+
+  const handleToggleWwcd = async () => {
+    try {
+      const res = await api.setOverlayVisibility('wwcd', 'toggle');
+      toast.success(
+        res.visible ? 'WWCD Winner Screen ON AIR' : 'WWCD Winner Screen disembunyikan',
+        res.visible
+          ? 'Winner screen (squad showcase, running ribbon & stats card) sedang tampil di stream OBS.'
+          : 'Winner screen sudah disembunyikan dari stream.',
+      );
+    } catch (err) {
+      toast.error('Gagal mengubah status WWCD Overlay', describe(err));
+    }
+  };
+
+  const handleCopyWwcdUrl = async () => {
+    const url = `${window.location.origin}/overlay/wwcd`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success('URL WWCD Winner Screen disalin ke clipboard!', url);
     } catch {
       toast.error('Gagal menyalin URL', url);
     }
@@ -557,6 +611,245 @@ export function ManualMatchControl() {
 
             <div className="text-[9px] text-center text-zinc-400">
               Menampilkan format 2 kolom lengkap (Top 8 kiri & Rank 9-16 kanan) dengan panggung 3D PMCC
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tournament Recap (Round 1 - 4 Standings) Section */}
+      <section className="rounded-xl border border-[#d49b35]/60 bg-gradient-to-r from-[#18120e] via-[#261910] to-[#18120e] p-4 shadow-xl">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider ${
+                isRecapOnAir
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-zinc-500/20 text-zinc-400 border border-zinc-500/30'
+              }`}
+            >
+              {isRecapOnAir && <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />}
+              {isRecapOnAir ? 'ON AIR' : 'OFF AIR'}
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm font-bold text-[#f5c553]">Tournament Recap (Round 1 - 4 Breakdown)</h4>
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#ffd24c]/20 text-[#ffd24c] border border-[#ffd24c]/40">
+                  NEW OVERLAY
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Rekap perolehan rank placement, perolehan kills, poin tiap round (R1, R2, R3, R4) + total WWCD & poin keseluruhan dengan background 3D stage PMCC.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => void handleToggleRecap()}
+              className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all shadow ${
+                isRecapOnAir
+                  ? 'bg-amber-600/90 hover:bg-amber-500 text-white'
+                  : 'bg-emerald-600 hover:bg-emerald-500 text-white animate-pulse'
+              }`}
+            >
+              {isRecapOnAir ? '⏹ Sembunyikan (Hide)' : '🔴 Tampilkan di Stream (ON AIR)'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => void handleCopyRecapUrl()}
+              className="rounded-lg border border-border bg-card/80 px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-accent transition-colors"
+              title="Salin URL Browser Source untuk OBS"
+            >
+              📋 Salin URL OBS
+            </button>
+
+            <a
+              href="/overlay/recap"
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-lg border border-[#d49b35]/40 bg-[#d49b35]/10 px-2.5 py-1.5 text-xs font-semibold text-[#f5c553] hover:bg-[#d49b35]/20 transition-colors inline-flex items-center gap-1"
+            >
+              ↗ Buka Overlay Fullscreen
+            </a>
+          </div>
+        </div>
+
+        {/* Mini Preview Box */}
+        <div
+          className="mt-3 relative rounded-lg overflow-hidden border border-[#d49b35]/50 h-38 bg-cover bg-center shadow-inner"
+          style={{ backgroundImage: "url('/images/postgame-bg.png')" }}
+        >
+          <div className="absolute inset-0 bg-black/65 backdrop-blur-[2px] flex flex-col justify-between p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase text-[#ffd24c] px-2 py-0.5 rounded bg-black/80 border border-[#ffd24c]/40">
+                LIVE PREVIEW: RECAP ROUND 1 - 4 (16 TEAMS &bull; PLACEMENT &amp; KILLS)
+              </span>
+              <span className="text-[10px] font-mono text-zinc-400">/overlay/recap</span>
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+              {/* Left Top 3 Preview with R1-R4 badge */}
+              <div className="flex-1 space-y-1">
+                {combinedTeams.slice(0, 3).map((t, idx) => (
+                  <div
+                    key={t.teamNo}
+                    className="flex items-center justify-between px-2 py-0.5 rounded bg-black/75 border border-[#d49b35]/30 text-[10px]"
+                  >
+                    <span className="font-bold text-[#ffd24c] truncate max-w-[120px]">
+                      #{idx + 1} {t.name}
+                    </span>
+                    <div className="flex items-center gap-1.5 font-mono">
+                      <span className="text-[9px] text-[#2bb0b8]">{t.kills}K</span>
+                      <span className="text-[9px] text-zinc-400">R1-R4</span>
+                      <span className="font-black text-[#ffd24c]">{t.totalPoints} PTS</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Center Trophy Icon */}
+              <div className="shrink-0 flex flex-col items-center">
+                <span className="text-xl">🏆</span>
+                <span className="text-[9px] font-black text-[#ffd24c] uppercase">PMCC RECAP</span>
+              </div>
+
+              {/* Right Ranks 4-6 Preview */}
+              <div className="flex-1 space-y-1">
+                {combinedTeams.slice(3, 6).map((t, idx) => (
+                  <div
+                    key={t.teamNo}
+                    className="flex items-center justify-between px-2 py-0.5 rounded bg-black/75 border border-[#d49b35]/20 text-[10px]"
+                  >
+                    <span className="font-semibold text-zinc-300 truncate max-w-[120px]">
+                      #{idx + 4} {t.name}
+                    </span>
+                    <div className="flex items-center gap-1.5 font-mono">
+                      <span className="text-[9px] text-[#2bb0b8]">{t.kills}K</span>
+                      <span className="font-black text-white">{t.totalPoints} PTS</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-[9px] text-zinc-400 border-t border-white/10 pt-1">
+              <span>Menampilkan rincian Round 1, Round 2, Round 3, Round 4 (Placement rank, Kills, Points)</span>
+              <span className="text-[#ffd24c] font-bold">16 Tim &bull; 3D Stage Background</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* WWCD Winner Screen Section */}
+      <section className="rounded-xl border border-[#ffd24c]/60 bg-gradient-to-r from-[#18120e] via-[#2c1d0d] to-[#18120e] p-4 shadow-xl">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider ${
+                isWwcdOnAir
+                  ? 'bg-amber-500/20 text-[#ffd24c] border border-[#ffd24c]/40 shadow-[0_0_12px_rgba(255,210,76,0.4)]'
+                  : 'bg-zinc-500/20 text-zinc-400 border border-zinc-500/30'
+              }`}
+            >
+              {isWwcdOnAir && <span className="size-2 rounded-full bg-[#ffd24c] animate-pulse" />}
+              {isWwcdOnAir ? 'WWCD ON AIR' : 'WWCD OFF AIR'}
+            </span>
+            <div>
+              <h4 className="text-sm font-bold text-[#ffd24c] flex items-center gap-1.5">
+                <span>🍗 WWCD Winner Screen (Squad Lineup & Ticker • 3D Stage)</span>
+              </h4>
+              <p className="text-[11px] text-muted-foreground">
+                Tampilan selebrasi Winner Winner Chicken Dinner (squad characters showcase, running ticker ribbon, dan 4 kartu statistik juara).
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => void handleToggleWwcd()}
+              className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all shadow ${
+                isWwcdOnAir
+                  ? 'bg-amber-600/90 hover:bg-amber-500 text-white'
+                  : 'bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white animate-pulse'
+              }`}
+            >
+              {isWwcdOnAir ? '⏹ Sembunyikan (Hide)' : '🔴 Tampilkan di Stream (ON AIR)'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => void handleCopyWwcdUrl()}
+              className="rounded-lg border border-border bg-card/80 px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-accent transition-colors"
+              title="Salin URL Browser Source untuk OBS"
+            >
+              📋 Salin URL OBS
+            </button>
+
+            <a
+              href="/overlay/wwcd"
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-lg border border-[#ffd24c]/40 bg-[#ffd24c]/10 px-2.5 py-1.5 text-xs font-semibold text-[#ffd24c] hover:bg-[#ffd24c]/20 transition-colors inline-flex items-center gap-1"
+            >
+              ↗ Buka Overlay Fullscreen
+            </a>
+          </div>
+        </div>
+
+        {/* Mini Preview Box */}
+        <div
+          className="mt-3 relative rounded-lg overflow-hidden border border-[#ffd24c]/40 h-36 bg-cover bg-center"
+          style={{ backgroundImage: "url('/images/postgame-bg.png')" }}
+        >
+          <div className="absolute inset-0 bg-black/65 backdrop-blur-[2px] flex flex-col justify-between p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase text-[#ffd24c] px-2 py-0.5 rounded bg-black/80 border border-[#ffd24c]/40 flex items-center gap-1">
+                <span>🍗</span> LIVE PREVIEW: WWCD WINNER SCREEN
+              </span>
+              <span className="text-[10px] font-mono text-zinc-400">/overlay/wwcd</span>
+            </div>
+
+            <div className="flex items-center justify-between gap-4 px-2">
+              {/* Winner Team Card */}
+              <div className="flex items-center gap-3 bg-black/80 border border-[#ffd24c]/50 rounded-lg p-2 flex-1">
+                <div className="size-10 rounded bg-[#2a1d12] border border-[#ffd24c]/40 flex items-center justify-center p-1 shrink-0">
+                  <img
+                    src="/images/chicken-dinner-badge.png"
+                    alt="Chicken dinner"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] font-black text-[#ffd24c] uppercase">WWCD CHAMPION</span>
+                  <div className="text-xs font-black text-white uppercase truncate">
+                    {currentLeader?.name ?? 'BIGETRON RA'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats highlights */}
+              <div className="flex items-center gap-2">
+                <div className="text-center px-3 py-1 rounded bg-black/80 border border-[#d49b35]/30">
+                  <div className="text-[8px] font-bold text-zinc-400 uppercase">RANK</div>
+                  <div className="text-sm font-black text-[#ffd24c]">#1</div>
+                </div>
+                <div className="text-center px-3 py-1 rounded bg-black/80 border border-[#d49b35]/30">
+                  <div className="text-[8px] font-bold text-zinc-400 uppercase">ELIMS</div>
+                  <div className="text-sm font-black text-white">{currentLeader?.kills ?? 14}</div>
+                </div>
+                <div className="text-center px-3 py-1 rounded bg-black/80 border border-[#d49b35]/30">
+                  <div className="text-[8px] font-bold text-zinc-400 uppercase">POINTS</div>
+                  <div className="text-sm font-black text-[#ffd24c]">{currentLeader?.totalPoints ?? 24}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-[9px] text-zinc-400 border-t border-white/10 pt-1">
+              <span>Menampilkan squad characters render, pan emas, running ticker, dan kartu skor lengkap</span>
+              <span className="text-[#ffd24c] font-bold">10_winner-screen.html style</span>
             </div>
           </div>
         </div>

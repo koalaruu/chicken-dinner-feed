@@ -18,6 +18,7 @@ import { InstanceToolbar } from '@/features/admin/InstanceToolbar';
 import { ManualMatchControl } from '@/features/admin/ManualMatchControl';
 import { CopyableUrl } from '@/features/admin/CopyableUrl';
 import { OnAirBadge } from '@/features/admin/OnAirBadge';
+import { OverlayExportModal } from '@/features/admin/OverlayExportModal';
 import { OverlayPreview } from '@/features/admin/OverlayPreview';
 import { ScoringEditor } from '@/features/admin/ScoringEditor';
 import { SeriesControl } from '@/features/admin/SeriesControl';
@@ -84,6 +85,7 @@ export function AdminPage() {
   const [newName, setNewName] = useState('');
   /** The instance the operator has asked to delete, pending confirmation. */
   const [pendingDelete, setPendingDelete] = useState<OverlayInstance | null>(null);
+  const [exportModal, setExportModal] = useState<OverlayInstance | null>(null);
   /**
    * Remembered across reloads: whether the preview or the instance list matters more is a working
    * preference, and an operator who collapsed it once should not have to do it again every session.
@@ -260,6 +262,23 @@ export function AdminPage() {
           </p>
         )}
       </ConfirmDialog>
+
+      {exportModal && (
+        <OverlayExportModal
+          open={Boolean(exportModal)}
+          type={exportModal.type || exportModal.id}
+          match={
+            snapshot?.match ?? {
+              matchId: null,
+              phase: 'idle',
+              teams: [],
+              standingTeamCount: 0,
+            }
+          }
+          appearance={exportModal.appearance}
+          onClose={() => setExportModal(null)}
+        />
+      )}
 
       {/*
        * The gold rule under the header echoes the accent strip on the overlay itself, so the tool
@@ -507,6 +526,7 @@ export function AdminPage() {
                     onSave={() => void saveInstance(selected)}
                     onToggleVisibility={() => void toggleVisibility(selected)}
                     onDelete={() => setPendingDelete(selected)}
+                    onDownloadPng={() => setExportModal(selected)}
                   />
 
                   <OverlayPreview instanceId={selected.id} />

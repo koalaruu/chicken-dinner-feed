@@ -1,15 +1,22 @@
 import type { MatchState, OverlayAppearance, Team } from '@cdf/shared';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { useState } from 'react';
 
-interface PostgameOverlayProps {
+export interface PostgameOverlayProps {
   match: MatchState;
   appearance?: OverlayAppearance;
   /** Force specific display mode: 'match' (single match result) or 'series' (accumulated) */
   defaultMode?: 'match' | 'series';
+  className?: string;
+  animate?: boolean;
 }
 
-export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverlayProps) {
+export function PostgameOverlay({
+  match,
+  defaultMode = 'match',
+  className = 'w-screen h-screen',
+  animate = true,
+}: PostgameOverlayProps) {
   const [mode, setMode] = useState<'match' | 'series'>(defaultMode);
 
   // Teams sorted by rank (displays all teams)
@@ -23,7 +30,9 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
   const winner = sortedTeams[0];
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden select-none font-sans text-white bg-black">
+    <div
+      className={`relative overflow-hidden select-none font-sans text-white bg-black ${className}`}
+    >
       {/* 3D Background from PMCC stage (0001.png) */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -57,7 +66,7 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
                   PMCC INDONESIA 2024
                 </span>
                 <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">
-                  OFFICIAL ESPORTS BROADCAST
+                  PENS ESPORTS BROADCAST
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wider bg-gradient-to-r from-white via-[#f5c553] to-[#e0a935] bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
@@ -92,6 +101,7 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
 
             <button
               type="button"
+              data-export-ignore="true"
               onClick={() => setMode((m) => (m === 'match' ? 'series' : 'match'))}
               className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#221812] hover:bg-[#2d2018] border border-[#d49b35]/50 text-[#f5c553] transition-all cursor-pointer shadow"
               title="Klik untuk beralih antara Hasil Match dan Akumulasi Turnamen"
@@ -102,13 +112,13 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
         </header>
 
         {/* CENTER TABLES SECTION: 2 Columns framing the Golden Trophy in the Center */}
-        <div className="flex-1 flex items-stretch justify-between gap-6 my-3 min-h-0">
+        <div className="flex-1 flex items-stretch justify-between gap-5 my-3 min-h-0 w-full overflow-hidden">
           {/* LEFT COLUMN */}
-          <div className="flex-1 flex flex-col justify-between max-w-[48%] bg-black/60 backdrop-blur-md rounded-xl p-3 border border-[#d49b35]/40 shadow-[0_8px_32px_rgba(0,0,0,0.85)]">
+          <div className="flex-1 min-w-0 flex flex-col justify-between bg-black/60 backdrop-blur-md rounded-xl p-3 border border-[#d49b35]/40 shadow-[0_8px_32px_rgba(0,0,0,0.85)]">
             <TableHeader label={leftTeams.length > 0 ? `RANKS 1 - ${leftTeams.length}` : 'STANDINGS'} />
             <div className="flex-1 flex flex-col justify-between gap-1.5 mt-2 overflow-hidden">
-              <AnimatePresence initial={false}>
-                {leftTeams.map((team, index) => (
+              {leftTeams.map((team, index) =>
+                animate ? (
                   <motion.div
                     key={team.teamNo}
                     initial={{ opacity: 0, x: -30 }}
@@ -118,19 +128,23 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
                   >
                     <TeamRowCard team={team} isWinner={team.rank === 1} />
                   </motion.div>
-                ))}
-              </AnimatePresence>
+                ) : (
+                  <div key={team.teamNo} className="flex-1 min-h-0">
+                    <TeamRowCard team={team} isWinner={team.rank === 1} />
+                  </div>
+                ),
+              )}
             </div>
           </div>
 
           {/* CENTER TROPHY FRAMING GAP: Leaves PMCC 3D Trophy fully visible */}
-          <div className="w-[140px] xl:w-[200px] 2xl:w-[260px] shrink-0 flex flex-col items-center justify-end pb-4 pointer-events-none">
+          <div className="w-[140px] xl:w-[170px] shrink-0 flex flex-col items-center justify-end pb-4 pointer-events-none">
             {winner && (
               <div className="flex flex-col items-center text-center px-3 py-2 rounded-xl bg-black/70 backdrop-blur-md border border-[#f5c553]/60 shadow-[0_0_30px_rgba(245,197,83,0.35)] animate-pulse">
                 <span className="text-[10px] font-black uppercase tracking-widest text-[#ffd24c]">
                   CHICKEN DINNER
                 </span>
-                <span className="text-sm font-black uppercase text-white truncate max-w-[180px]">
+                <span className="text-sm font-black uppercase text-white truncate max-w-[160px]">
                   {winner.name}
                 </span>
                 <span className="text-[10px] font-extrabold text-[#d49b35]">
@@ -141,7 +155,7 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
           </div>
 
           {/* RIGHT COLUMN */}
-          <div className="flex-1 flex flex-col justify-between max-w-[48%] bg-black/60 backdrop-blur-md rounded-xl p-3 border border-[#d49b35]/40 shadow-[0_8px_32px_rgba(0,0,0,0.85)]">
+          <div className="flex-1 min-w-0 flex flex-col justify-between bg-black/60 backdrop-blur-md rounded-xl p-3 border border-[#d49b35]/40 shadow-[0_8px_32px_rgba(0,0,0,0.85)]">
             <TableHeader
               label={
                 rightTeams.length > 0
@@ -150,8 +164,8 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
               }
             />
             <div className="flex-1 flex flex-col justify-between gap-1.5 mt-2 overflow-hidden">
-              <AnimatePresence initial={false}>
-                {rightTeams.map((team, index) => (
+              {rightTeams.map((team, index) =>
+                animate ? (
                   <motion.div
                     key={team.teamNo}
                     initial={{ opacity: 0, x: 30 }}
@@ -161,8 +175,12 @@ export function PostgameOverlay({ match, defaultMode = 'match' }: PostgameOverla
                   >
                     <TeamRowCard team={team} isWinner={false} />
                   </motion.div>
-                ))}
-              </AnimatePresence>
+                ) : (
+                  <div key={team.teamNo} className="flex-1 min-h-0">
+                    <TeamRowCard team={team} isWinner={false} />
+                  </div>
+                ),
+              )}
             </div>
           </div>
         </div>

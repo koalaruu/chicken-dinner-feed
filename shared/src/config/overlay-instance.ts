@@ -107,7 +107,7 @@ export const overlayInstanceIdSchema = z
     'Use 1–32 lowercase letters, digits or hyphens, starting with a letter or digit.',
   );
 
-export const overlayInstanceTypeSchema = z.enum(['leaderboard', 'top4', 'elimination', 'postgame']);
+export const overlayInstanceTypeSchema = z.enum(['leaderboard', 'top4', 'elimination', 'postgame', 'recap', 'wwcd']);
 export type OverlayInstanceType = z.infer<typeof overlayInstanceTypeSchema>;
 
 export const overlayInstanceSchema = z.object({
@@ -242,6 +242,64 @@ export const DEFAULT_POSTGAME_APPEARANCE: OverlayAppearance = {
   maxTeams: 25,
 };
 
+export const DEFAULT_RECAP_APPEARANCE: OverlayAppearance = {
+  ...DEFAULT_OVERLAY_APPEARANCE,
+  anchor: 'left',
+  offsetX: 0,
+  offsetY: 0,
+  scale: 1,
+  colors: {
+    background: '#18120e',
+    headerBackground: '#f5c553',
+    rowAltBackground: '#16252c',
+    text: '#ffffff',
+    textMuted: '#e5a93c',
+    accent: '#d49b35',
+    playerAlive: '#ffd24c',
+    playerKnocked: '#f5a524',
+    playerDead: '#38383f',
+  },
+  animation: {
+    type: 'fade',
+    direction: 'top',
+    durationMs: 500,
+    easing: 'smooth',
+    withFade: true,
+    rows: { enabled: true, staggerMs: 40, reverseOnHide: false },
+  },
+  showLegend: false,
+  maxTeams: 25,
+};
+
+export const DEFAULT_WWCD_APPEARANCE: OverlayAppearance = {
+  ...DEFAULT_OVERLAY_APPEARANCE,
+  anchor: 'left',
+  offsetX: 0,
+  offsetY: 0,
+  scale: 1,
+  colors: {
+    background: '#18120e',
+    headerBackground: '#f5c553',
+    rowAltBackground: '#16252c',
+    text: '#ffffff',
+    textMuted: '#e5a93c',
+    accent: '#ffd24c',
+    playerAlive: '#ffd24c',
+    playerKnocked: '#f5a524',
+    playerDead: '#38383f',
+  },
+  animation: {
+    type: 'fade',
+    direction: 'top',
+    durationMs: 600,
+    easing: 'smooth',
+    withFade: true,
+    rows: { enabled: false, staggerMs: 40, reverseOnHide: false },
+  },
+  showLegend: false,
+  maxTeams: 25,
+};
+
 export const DEFAULT_OVERLAY_INSTANCES: OverlayInstancesDocument = {
   schemaVersion: CONFIG_SCHEMA_VERSION,
   instances: [
@@ -268,6 +326,18 @@ export const DEFAULT_OVERLAY_INSTANCES: OverlayInstancesDocument = {
       name: 'Postgame Match Standings',
       type: 'postgame',
       appearance: DEFAULT_POSTGAME_APPEARANCE,
+    },
+    {
+      id: 'recap',
+      name: 'Tournament Recap (Round 1-4)',
+      type: 'recap',
+      appearance: DEFAULT_RECAP_APPEARANCE,
+    },
+    {
+      id: 'wwcd',
+      name: 'WWCD Winner Screen',
+      type: 'wwcd',
+      appearance: DEFAULT_WWCD_APPEARANCE,
     },
   ],
 };

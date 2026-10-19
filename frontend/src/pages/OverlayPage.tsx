@@ -4,8 +4,10 @@ import { useEffect, useState, type CSSProperties } from 'react';
 import { appearanceToAnimation, appearanceToPosition } from '@/components/overlay/appearance';
 import { LeaderboardOverlay } from '@/components/overlay/LeaderboardOverlay';
 import { PostgameOverlay } from '@/components/overlay/PostgameOverlay';
+import { RecapOverlay } from '@/components/overlay/RecapOverlay';
 import { TeamEliminatedPopup } from '@/components/overlay/TeamEliminatedPopup';
 import { Top4Overlay } from '@/components/overlay/Top4Overlay';
+import { WwcdOverlay } from '@/components/overlay/WwcdOverlay';
 import { u } from '@/components/overlay/overlay-scale';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useEliminationWatcher } from '@/hooks/useEliminationWatcher';
@@ -104,12 +106,58 @@ export function OverlayPage({ instanceId }: OverlayPageProps) {
   const isTop4 = instance?.type === 'top4' || instanceId === 'top4';
   const isEliminationOnly = instance?.type === 'elimination' || instanceId === 'elimination';
   const isPostgame = instance?.type === 'postgame' || instanceId === 'postgame';
+  const isRecap = instance?.type === 'recap' || instanceId === 'recap';
+  const isWwcd = instance?.type === 'wwcd' || instanceId === 'wwcd';
+
+  if (isWwcd) {
+    return (
+      <>
+        {isPreview && <div style={PREVIEW_BACKDROP} aria-hidden />}
+        <AnimatePresence initial={false}>
+          {overlay.visible && (
+            <motion.div
+              key="wwcd-panel"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.5 }}
+              className="w-screen h-screen"
+            >
+              <WwcdOverlay match={snapshot.match} appearance={appearance} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </>
+    );
+  }
 
   if (isEliminationOnly) {
     return (
       <>
         {isPreview && <div style={PREVIEW_BACKDROP} aria-hidden />}
         <TeamEliminatedPopup anchor={appearance.anchor} />
+      </>
+    );
+  }
+
+  if (isRecap) {
+    return (
+      <>
+        {isPreview && <div style={PREVIEW_BACKDROP} aria-hidden />}
+        <AnimatePresence initial={false}>
+          {overlay.visible && (
+            <motion.div
+              key="recap-panel"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.4 }}
+              className="w-screen h-screen"
+            >
+              <RecapOverlay match={snapshot.match} appearance={appearance} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </>
     );
   }

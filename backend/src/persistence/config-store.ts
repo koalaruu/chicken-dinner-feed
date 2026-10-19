@@ -110,6 +110,14 @@ export class ConfigStore {
       const postgameDefault = DEFAULT_OVERLAY_INSTANCES.instances.find((i) => i.id === 'postgame');
       if (postgameDefault) toAdd.push(postgameDefault);
     }
+    if (!this.findInstance('recap')) {
+      const recapDefault = DEFAULT_OVERLAY_INSTANCES.instances.find((i) => i.id === 'recap');
+      if (recapDefault) toAdd.push(recapDefault);
+    }
+    if (!this.findInstance('wwcd')) {
+      const wwcdDefault = DEFAULT_OVERLAY_INSTANCES.instances.find((i) => i.id === 'wwcd');
+      if (wwcdDefault) toAdd.push(wwcdDefault);
+    }
     if (toAdd.length > 0) {
       await this.saveInstances([...this.instances.current.instances, ...toAdd]);
     }

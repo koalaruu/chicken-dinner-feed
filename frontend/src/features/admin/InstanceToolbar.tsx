@@ -1,5 +1,5 @@
 import type { OverlayInstance } from '@cdf/shared';
-import { Trash2 } from 'lucide-react';
+import { Download, Trash2 } from 'lucide-react';
 import { OnAirBadge } from './OnAirBadge';
 
 export interface InstanceToolbarProps {
@@ -12,6 +12,7 @@ export interface InstanceToolbarProps {
   onSave(): void;
   onToggleVisibility(): void;
   onDelete(): void;
+  onDownloadPng?: () => void;
 }
 
 /**
@@ -29,6 +30,7 @@ export function InstanceToolbar({
   onSave,
   onToggleVisibility,
   onDelete,
+  onDownloadPng,
 }: InstanceToolbarProps) {
   return (
     <div className="border-border bg-card grid gap-3 rounded-lg border p-3">
@@ -85,12 +87,24 @@ export function InstanceToolbar({
           <OnAirBadge visible={visible} />
           <button
             type="button"
-            className="hover:bg-secondary rounded px-2 py-1 text-sm"
+            className="hover:bg-secondary rounded px-2 py-1 text-sm cursor-pointer"
             onClick={onToggleVisibility}
           >
             {visible === true ? 'Hide it' : visible === false ? 'Show it' : 'Show / hide'}
           </button>
         </div>
+
+        {onDownloadPng && (
+          <button
+            type="button"
+            onClick={onDownloadPng}
+            className="flex items-center gap-1.5 rounded-lg border border-[#ffd24c]/60 bg-gradient-to-r from-[#ffd24c] via-[#f5c553] to-[#d49b35] px-3 py-1.5 text-xs font-black text-[#18110a] shadow transition-all hover:brightness-110 active:scale-95 cursor-pointer"
+            title="Download gambar PNG resolusi tinggi (Anti-Pecah)"
+          >
+            <Download className="size-3.5" />
+            <span>Download PNG</span>
+          </button>
+        )}
       </div>
     </div>
   );
