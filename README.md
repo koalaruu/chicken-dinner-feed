@@ -46,15 +46,21 @@ Full instructions: **[English](docs/user/user-guide.en.md)** · **[Magyar](docs/
 
 ### Getting started
 
+From PowerShell on Windows:
+
 ```bash
 git clone <repo-url>
 cd chicken-dinner-feed
-npm install          # installs all three workspaces
-npm run dev          # shared (watch) + backend (4317) + frontend (4318)
+Copy-Item backend\.env.example backend\.env
+# Edit backend\.env and set INGEST_SOURCE=manual for manual scorekeeping.
+npm ci
+npm run dev
 ```
 
-Open <http://127.0.0.1:4318>. The Vite dev server proxies `/api` and `/ws` to the backend, so the
-app always talks to a same-origin API in both development and production.
+Open <http://127.0.0.1:4318/admin>. The Vite dev server proxies `/api` and `/ws` to the backend, so
+the app always talks to a same-origin API in both development and production. With
+`INGEST_SOURCE=manual`, start and update matches from the admin UI instead of connecting to PCOB.
+For the production-style server on port 4317, run `npm run build` once and then `.\startup.bat`.
 
 | Command             | What it does                                                 |
 | ------------------- | ------------------------------------------------------------ |
